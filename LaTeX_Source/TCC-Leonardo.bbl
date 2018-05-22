@@ -1,0 +1,77 @@
+\begin{thebibliography}{\hspace{\parindent}}
+
+\bibitem[{AT91SAM Community}(2012){AT91SAM Community}]{sam4} {AT91SAM
+  Community}. \textbf{Real Time solutions on AT91SAM SoC}. {Disponível em:
+  <http://www.at91.com/linux4sam/bin/view/Linux4SAM/RealTime>. Acesso em 23
+  Oct. 2012}.
+
+\bibitem[{eLinux.ORG}(2012){eLinux.ORG}]{elinux} {eLinux.ORG}. \textbf{Realtime
+  Testing Best Practices}. {Disponível em:
+  <http://elinux.org/Realtime\_Testing\_Best\_Practices>. Acesso em 23 Oct.
+  2012}.
+
+\bibitem[{Free Software Foundation}(2012){Free Software Foundation}]{flossDef}
+  {Free Software Foundation}. \textbf{A Definição de Software Livre}.
+  {Disponível em: <http://www.gnu.org/philosophy/free-sw.html>. Acesso em 22
+  Oct. 2012}.
+
+\bibitem[{Gartner Inc.}(2012){Gartner Inc.}]{MobileStat} {Gartner Inc.}
+  \textbf{Worldwide Mobile Device Sales to End Users by Operating System in
+  2Q12}. {Disponível em: <http://www.gartner.com/it/page.jsp?id=2120015>.
+  Acesso em 21 Oct. 2012}.
+
+\bibitem[{Kernel.ORG}(2012a){Kernel.ORG}]{linuxSource} {Kernel.ORG}.
+  \textbf{Linux Kernel Archives}. {Disponível em: <https://kernel.org>. Acesso
+  em 25 Oct. 2012}.
+
+\bibitem[{Kernel.ORG}(2012b){Kernel.ORG}]{rtpatch} {Kernel.ORG}. \textbf{Real
+  Time Linux Patch}. {Disponível em: <https://rt.wiki.kernel.org>. Acesso em 23
+  Oct. 2012}.
+
+\bibitem[LI; YAO(2003)LI; YAO]{RTbook} LI, Q.; YAO, C\@. \textbf{Real-Time
+  Concepts for Embedded Systems}. San Francisco, CA: CPM Books, 2003. 294p.
+
+\bibitem[LOCKE(2005)LOCKE]{locke2005posix} LOCKE, C\@. Posix and linux
+  application compatibility design rules. \textbf{system}, [S.l.], v.20, p.21,
+  2005.
+
+\bibitem[MATTHEW; STONES(2008)MATTHEW; STONES]{bLp} MATTHEW, N.; STONES, R\@.
+  \textbf{Beginning Linux® Programming 4th Ed.} Indianapolis, IN: CPM Books,
+  2008. 780p.
+
+\bibitem[{Olimex Ltd}(2009){Olimex Ltd}]{kitMan} {Olimex Ltd}.
+  \textbf{SAM9-L9260 development board User's Manual}. {Disponível em:
+  <http://www.opencore.eesc.usp.br/leonardo/Documentos/Manual.pdf> (Rev.D) e
+  <https://www.olimex.com/Products/ARM/Atmel/SAM9-L9260/resources/SAM9-L9260.p%
+df> (Rev.B). Acesso em 23 Oct. 2012}.
+
+\bibitem[{Open Source Initiative}(2007){Open Source Initiative}]{gpl} {Open
+  Source Initiative}. \textbf{GNU General Public License, version 3 (GPL-3.0)}.
+  {Disponível em: <http://opensource.org/licenses/GPL-3.0>. Acesso em 02 Dec.
+  2012}.
+
+\bibitem[{Open Source Initiative}(2008){Open Source Initiative}]{bsd} {Open
+  Source Initiative}. \textbf{The BSD 3-Clause License}. {Disponível em:
+  <http://opensource.org/licenses/BSD-3-Clause>. Acesso em 02 Dec. 2012}.
+
+\bibitem[SIEVER et~al.(2009)SIEVER; WEBER; FIGGINS; LOVE;
+  ROBBINS]{siever2009linux} SIEVER, E.; WEBER, A.; FIGGINS, S.; LOVE, R.;
+  ROBBINS, A\@. \textbf{Linux in a Nutshell}. [S.l.]: O'Reilly Media,
+  Incorporated, 2009.
+
+\bibitem[SILVA(2010)SILVA]{focalinux} SILVA, G.~M.~da. \textbf{Guia Foca
+  GNU/Linux}. Brasil: Focalinux.org, 2010. 850p.
+
+\bibitem[SLOSS; SYMES; WRIGHT(2004)SLOSS; SYMES; WRIGHT]{armBook} SLOSS, A.~N.;
+  SYMES, D.; WRIGHT, C\@. \textbf{ARM System Developer's Guide}. San Francisco,
+  CA: Elsevier, 2004. 689p.
+
+\bibitem[TANENBAUM(2003)TANENBAUM]{osT} TANENBAUM, A.~S\@. \textbf{Sistemas
+  Operacionais Modernos}. São Paulo, SP: Pearson, 2003. 673p.
+
+\bibitem[{Top500 Supercomputer Sites}(2012){Top500 Supercomputer
+  Sites}]{top500} {Top500 Supercomputer Sites}. \textbf{Top500 Statistics}:
+  operating system family and performance share. {Disponível em:
+  <http://i.top500.org/stats>. Acesso em 23 Oct. 2012}.
+
+\end{thebibliography}

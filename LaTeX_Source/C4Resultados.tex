@@ -1,0 +1,371 @@
+\chapter{Resultados}
+\label{ch:res}
+Este capítulo apresenta os resultados dos testes apresentados no Capítulo 3. A Seção \ref{sec:clkr} apresenta os resultados dos testes de \textit{clock}. Na Seção \ref{sec:gpior} são apresentados os resultados dos testes de GPIO. Já a Seção \ref{sec:cycr} apresenta os resultados do \textit{CyclicTest}.
+
+Note que nos resultados dos testes mostrados da Figura \ref{fig:bclknrt} até a Figura \ref{fig:crt-l} deve-se verificar as medidas de tempo utilizando os valores dos cursores a direita de cada figura, onde são representados pela variável $\Delta  X$, visto que a escala de cada imagem foi ajustada para preservar a riqueza de detalhes.
+
+\section{Teste de \textit{Clock}}
+\label{sec:clkr}
+O teste de \textit{clock} foi realizado de duas maneiras: uma por \textit{Bash-Script}, mostrado na primeira Seção, e outra por um executável escrito em linguagem C, mostrado na segunda Seção.\\ A constução de ambos os testes é mostrada no Apêndice \ref{ap:clk}.
+
+\subsection{\textit{Clock} em \textit{Bash-Script}}
+
+A Figura \ref{fig:bclknrt} é resultado do programa \textit{bash-clock} rodado no Linux com \textit{patch} RT, a partir do seguinte comando:
+  \begin{lstlisting}
+./bash-clock
+ \end{lstlisting}
+
+	\begin{figure}
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_bash_srt.png}
+	    \caption{\textit{Clock} via \textit{Bash-Script} no Linux com o \textit{patch} RT.}
+	    \label{fig:bclknrt}
+	  \end{center}
+	\end{figure}
+ 
+A Figura \ref{fig:bclknon} é  resultado do programa \textit{bash-clock} rodado no Linux sem o \textit{patch} RT, a partir do comando:
+  \begin{lstlisting}
+chrt -f 99./bash-clock
+ \end{lstlisting}
+
+ A Figura \ref{fig:bclkrt}, é fruto do programa \textit{bash-clock} rodado no Linux com \textit{patch} RT a partir do seguinte comando:
+  \begin{lstlisting}
+  chrt -f 99 ./bash-clock
+ \end{lstlisting}
+
+ 
+	\begin{figure}
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_bash_non.png}
+	    \caption{\textit{Clock} via \textit{Bash-Script} no Linux sem o \textit{patch} RT, com \textit{chrt}.}
+	    \label{fig:bclknon}
+	  \end{center}
+	\end{figure}
+
+
+	\begin{figure}
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_bash_crt.png}
+      \caption{\textit{Clock} via \textit{Bash-Script} no Linux com o \textit{patch} RT, usando \textit{chrt}.}
+ 	    \label{fig:bclkrt}
+	  \end{center}
+	\end{figure}
+
+Todos os resultados do teste de \textit{clock} escrito em Bash-Script estão concentrados na tabela \ref{clktabb}.
+
+\begin{table}[H]
+      \centering
+      \caption{Resultados do Teste de Clock - \textit{Bash-Script}} 
+      \begin{tabular}{cccc}
+      \hline
+                & Ambiente & \textit{Bash-Script} \\
+                \hline
+              A & Linux + patch RT (sem chrt) & 1240 us  \\
+              B & Linux - patch RT (com chrt) & 1060 us \\
+              C & Linux + patch RT (com chrt) & 720 us  \\
+              \hline
+              \hline
+                & Comparativo &  \\
+                \hline
+                & B/A & 85,4\%  \\
+                & C/A & 58,0\%  \\
+                & C/B & 67,9\%  \\
+      \hline 
+      \end{tabular}
+      \label{clktabb}
+\end{table}
+
+Pode-se verificar, a partir das figuras apresentadas, que o uso do \textit{chrt} reduz os períodos de semi-ciclo, e que o efeito é mais expressivo no caso do teste usando chrt, mostrado na Figura \ref{fig:bclkrt}, onde o valor equivale a menos de 60\% do tempo da execução sem o uso do comando \textit{chrt}, conforme mostra a Figura \ref{fig:bclknrt}. Sabendo que o processo executado era exatamente o mesmo em todos os casos, pode-se confirmar que o \textit{chrt} produz melhores resultados evitando que a tarefa de \textit{clock} seja interrompida por outras tarefas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\textit{Clock} escrito em Linguagem C}
+
+
+A Figura \ref{fig:clknrt} é resultado do programa \textit{c-clock} rodado no Linux com \textit{patch} RT, a partir do seguinte comando:
+  \begin{lstlisting}
+./c-clock
+ \end{lstlisting}
+ 
+ 
+A Figura \ref{fig:clknon} é resultado do Teste de \textit{Clock} para o Linux sem o \textit{patch} RT, a partir do comando:
+  \begin{lstlisting}
+chrt -f 99./c-clock
+ \end{lstlisting}
+
+
+	A Figura \ref{fig:clkrt}, é fruto do programa \textit{c-clock} rodado no Linux com \textit{patch} RT a partir do seguinte comando:
+  \begin{lstlisting}
+  chrt -f 99 ./c-clock
+ \end{lstlisting}
+
+	
+
+			\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_csrt.png}
+	    \caption{\textit{Clock} escrito em Linguagem C, no Linux com o \textit{patch} RT.}
+	    \label{fig:clknrt}
+	  \end{center}
+	\end{figure}
+	
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_srt_non.png}
+	    \caption{\textit{Clock} escrito em Linguagem C, no Linux sem o \textit{patch} RT, usando \textit{chrt}.}
+	    \label{fig:clknon}
+	  \end{center}
+	\end{figure}
+
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/clk_crt.png}
+	    \caption{\textit{Clock} escrito em Linguagem C, no Linux com o \textit{patch} RT, usando \textit{chrt}.}
+	    \label{fig:clkrt}
+	  \end{center}
+	\end{figure}
+
+Todos os resultados do teste de \textit{clock} escrito em Linguagem C estão concentrados na tabela \ref{clktabc}.
+
+\begin{table}[H]
+      \centering
+      \caption{Resultados do Teste de Clock - Linguagem C} 
+      \begin{tabular}{ccc}
+      \hline
+                & Ambiente &  Linguagem C  \\
+                \hline
+              A & Linux + patch RT (sem chrt) & 240 us \\
+              B & Linux - patch RT (com chrt) & 232 us \\
+              C & Linux + patch RT (com chrt) & 44 us \\
+              \hline
+              \hline
+                & Comparativo &  \\
+                \hline
+                & B/A  & 96,7\% \\
+                & C/A  & 18,3\% \\
+                & C/B  & 19,0\% \\
+      \hline 
+      \end{tabular}
+      \label{clktabc}
+\end{table}
+
+Através destes testes de \textit{Clock}, pode-se notar a aplicação escrita em C tem uma eficiência maior, pelo fato de que o teste em \textit{Bash-Script} realiza a abertura e fechamento do \textit{file-descriptor} do GPIO a cada mudança de nível, enquanto o teste escrito em C realiza a abertura do \textit{file descriptor} apenas uma vez no início do programa. Isso significa uma boa redução de chamadas do sistema e explica a redução drástica nos valores de tempo de meia-onda.
+
+Pode-se verificar também que, novamente,  apesar de também aparecer no Linux sem \textit{patch} RT (Figura \ref{fig:clknon}),  a redução no tempo de semi-ciclo foi mais drástica no caso do Linux com \textit{patch} RT (Figura \ref{fig:clkrt}), atingindo o valor menor que 20\% do total percebido no mesmo ambiente sem o uso de \textit{chrt}.
+
+É importante ressaltar que, após a chamada do comando com \textit{chrt}, no caso do Linux com \textit{patch} RT, o Sistema Operacional parou de responder, indicando que toda a prioridade de execução havia sido dada ao programa de teste, a ponto de não haver condições de o Sistema Operacional atender os requerimentos do usuário.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Teste de Latência por GPIO}
+\label{sec:gpior}
+O teste de latência foi aplicado a  dois ambientes distintos: O primeiro ambiente, descrito na Seção \ref{sub:noload}, opera com baixa carga de processamento, e portanto há pouca concorrência entre tarefas. O segundo ambiente, descrito na Seção \ref{sub:load}, opera com sobrecarga de processamento, e portanto há mais concorrência entre tarefas.
+
+\subsection{Ambiente operando com Baixa Carga de processamento}
+\label{sub:noload}
+
+A Figura \ref{fig:srt-n} é resultado do Teste de GPIO no ambiente Linux com \textit{patch} RT rodado pelo seguinte comando:
+  \begin{lstlisting}
+  chrt -f 99 ./gpio-test
+ \end{lstlisting}
+
+
+
+A Figura \ref{fig:crt-n} é resultado do Teste de GPIO no ambiente Linux sem \textit{patch} RT rodado pelo seguinte comando:
+  \begin{lstlisting}
+  chrt -f 99 ./gpio-test
+ \end{lstlisting}
+	
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/nrt_n-comp.png}
+	    \caption{Teste por GPIO, com baixa carga, no Linux sem o \textit{patch} RT.}
+	    \label{fig:srt-n}
+	  \end{center}
+	\end{figure}
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/rt_n-comp.png}
+	    \caption{Teste por GPIO, com baixa carga, no Linux com o \textit{patch} RT.}
+	    \label{fig:crt-n}
+	  \end{center}
+	\end{figure}
+	
+Os resultados do teste em baixa carga estão concentrados na tabela \ref{tabgpion}.
+	\begin{table}[H]
+      \centering
+      \caption{Resultados do Teste de Latência por GPIO - Baixa Carga} 
+      \begin{tabular}{cccc}
+      \hline
+                & Ambiente & Latência Mínima & Latência Maxima  \\
+                \hline
+              A & Linux padrão & 134 us & 784 us \\
+              B & Linux com o patch RT & 218 us & 416 us \\
+              \hline
+              \hline
+                & Comparativo & & \\
+                \hline
+                & B/A & 162,7\% & 53,0 \% \\
+               
+      \hline 
+      \end{tabular}
+      \label{tabgpion}
+\end{table}
+	
+	Como o binário rodado era o mesmo, pode-se perceber que a previsibilidade do tempo de resposta da Figura \ref{fig:srt-n} é bastante inferior à da \ref{fig:crt-n}, que apresentou um tempo máximo de resposta muito mais elevado. Isso ocorre porque, mesmo com o \textit{chrt}, o ambiente sem o \textit{patch} RT não tem as condições de evitar que a tarefa  seja interrompida por outras. Já o ambiente com \textit{patch} RT já mostra resultados mais condizentes com as necessidades de um Sistema de Tempo-Real.
+
+	
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Ambiente operando com Sobrecarga de processamento}
+\label{sub:load}
+O algoritmo que gera a carga no ambiente pode ser encontrado no Apêndice \ref{ap:load}. Ele é executado antes do comando de teste, como será mostrado a seguir. 
+
+A Figura \ref{fig:srt-l} é resultado do Teste de GPIO no ambiente Linux com \textit{patch} RT, com algoritmo de sobrecarga, rodado pelo seguinte comando:
+
+  \begin{lstlisting}
+  ./doload.sh 65 &; chrt -f 99 ./gpio-test
+# O primeiro comando (antes do ';') é o algoritmo de carga, e ele é rodado em segundo plano, evidenciado pelo uso do &.
+ \end{lstlisting}
+
+A Figura \ref{fig:crt-l} é resultado do Teste de GPIO no ambiente Linux sem \textit{patch} RT, com algoritmo de sobrecarga, rodado pelo seguinte comando:
+ 
+  \begin{lstlisting}
+  ./doload.sh 65 &; chrt -f 99 ./gpio-test
+ \end{lstlisting}
+
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/nrt_l-comp.png}
+	    \caption{Teste por GPIO, com sobrecarga, no Linux sem o \textit{patch} RT.}
+	    \label{fig:srt-l}
+	  \end{center}
+	\end{figure}
+	\begin{figure}[H]
+	  \begin{center}
+	    \includegraphics[width=400px]{figuras/rt_l-comp.png}
+	    \caption{Teste por GPIO, com sobrecarga, no Linux com o \textit{patch} RT.}
+	    \label{fig:crt-l}
+	  \end{center}
+	\end{figure}
+
+
+Os resultados do teste em sobrecarga estão concentrados na tabela \ref{tabgpiol}.
+
+	\begin{table}[H]
+      \centering
+      \caption{Resultados do Teste de Latência por GPIO - Sobrecarga} 
+      \begin{tabular}{cccc}
+      \hline
+                & Ambiente & Latência Mínima & Latência Maxima  \\
+                \hline
+              A & Linux padrão & 140 us & 4000 us \\
+              B & Linux com o patch RT & 262 us & 450 us \\
+              \hline
+              \hline
+                & Comparativo & & \\
+                \hline
+                & B/A & 187,1,7\% & 11,3\% \\
+               
+      \hline 
+      \end{tabular}
+      \label{tabgpiol}
+\end{table}
+
+É bem simples visualizar que a previsibilidade de tempos de resposta do ambiente com o \textit{patch} RT é muito mais elevada do que a do ambiente sem o \textit{patch}. Isso fica mais evidente no ambiente com sobrecarga, pois a quantidade de tarefas concorrendo com o teste realizado cresce, ocasionando que o teste no ambiente sem o \textit{patch} RT seja interrompido mais vezes do que quando não há carga. Já no ambiente com o \textit{patch} não há necessidade de preocupações com a carga, já que a tarefa de teste tem a maior prioridade possível. 
+
+
+
+Em um caso prático, a tarefa de teste é substituída pela tarefa crítica do Sistema de Tempo Real, que precisa ser atendida dentro de um prazo definido. O ambiente com o \textit{patch} RT sempre seria capaz de atender a tarefa se o prazo fosse menor que 500us, mesmo quando houvesse sobrecarga no sistema. Já o ambiente sem o \textit{patch} teria perdido vários prazos e poderia ter levado à instabilidade do sistema de Tempo Real. 
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\section{\textit{CyclicTest}} %%%%%%%%%%%
+\label{sec:cycr}
+
+Para o experimento, dois Kits foram carregados com o mesmo RootFS, e dois Linux diferentes, sendo um deles com o \textit{patch} RT e o outro sem. Ambos os sistemas foram acessados via acesso remoto (SSH - \textit{Secure Shell}) por terminais diferentes, como mostrado abaixo:
+ 
+  \begin{lstlisting}
+# No Terminal #1, kit sem patch RT.
+  ssh root@10.235.0.135
+# No Terminal #2, kit com patch RT.
+  ssh root@10.235.0.136
+ \end{lstlisting}
+ 
+ Em cada um dos terminais, foram solicitadas duas tarefas de cada placa, sendo a primeira com o objetivo de listar as características do ambiente e outra o próprio \textit{CyclicTest}. Os comandos para tal são mostrados a seguir:
+
+  \begin{lstlisting}
+# Lista características.
+  uname -a
+# Executa o Cyclictest
+  time cyclictest -m -a -t -n -p99
+ \end{lstlisting}
+	
+Após isso, o computador host, que acessou ambos os Kits via SSH, foi bloqueado e só voltou a ser desbloqueado ao final de um pouco mais de 90h. Os resultados foram obtidos após o desbloqueio do computador, quando os testes foram parados. No primeiro Kit, em que não foi aplicado o \textit{patch} RT no Linux, foi obtido o seguinte resultado:
+
+  \begin{lstlisting}
+# No Terminal #1, kit sem patch RT.
+# Resultado do uname -a
+"Linux SAM9-L9260 3.4.9 #3 PREEMPT Mon Oct 15 12:44:15 BRT 2012 armv5tejl GNU/Linux"
+# Resultado do CyclicTest
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.42 0.41 0.41 1/39 2284          
+
+T: 0 ( 1153) P:99 I:1000 C:326973304 Min: 61 Act: 132 Avg: 123 Max: 19178
+^C
+real	5449m33.611s 
+user	371m19.100s
+sys	269m35.670s
+
+"O tempo 'real' convertido é: == 326973,304s == 90h49m33s"
+ \end{lstlisting}
+ 
+O resultado obtido pelo segundo Kit, no qual o Linux recebeu aplicação do \textit{patch} RT, é mostrado a seguir:
+
+  \begin{lstlisting}
+# No Terminal #2, kit com patch RT.
+# Resultado do uname -a
+"Linux SAM9-L9260 3.4.9-rt17 #11 PREEMPT RT Mon Sep 10 17:25:28 BRT 2012 armv5tejl GNU/Linux"
+# Resultado do CyclicTest
+# /dev/cpu_dma_latency set to 0us
+policy: fifo: loadavg: 0.49 0.59 0.59 1/48 1543          
+T: 0 ( 1165) P:99 I:1000 C:171597989 Min:  65 Act: 132 Avg: 116 Max: 247
+ \end{lstlisting}
+ 
+Neste segundo Kit, que rodava o Linux com o \textit{patch} RT, ocorreu o travamento do serviço de servidor SSH, entretanto, levando-se em consideração que foi pedido um ciclo de teste a cada 1ms, e que o teste anterior respeitou a proporção, o tempo deste teste pode ser calculado através do numero de cilos realizados:
+
+  \begin{lstlisting}
+"Tempo: 171597989 ciclos == 171597,989s == 2859m58s == 47h39m58s =~ 2 dias"
+ \end{lstlisting}
+ 
+Como o cliente SSH registrou o resultado disponível após aproximadamente 48h de teste, considerou-se que o teste já havia registrado uma boa quantidade de dados, não houve preocupação com a origem do travamento, deixando este ser um tema de estudo e investigações futuros. 
+
+Os dados dos testes usando Cyclictest foram concentrados na tabela \ref{tabcycl}:
+
+ 	\begin{table}[H]
+      \centering
+      \caption{Resultados do Teste Cyclictest} 
+      \begin{tabular}{ccccc}
+      \hline
+                & Ambiente & Latência Mínima & Latência Média & Latência Maxima  \\
+                \hline
+              A & Linux padrão & 61 us & 123 us & 19178 us \\
+              B & Linux com o patch RT & 65 us & 116 us & 247 us \\
+              \hline
+              \hline
+                & Comparativo & & \\
+                \hline
+                & B/A & 106,5\% & 94,3\% & 1,3\% \\
+               
+      \hline 
+      \end{tabular}
+      \label{tabcycl}
+\end{table}
+ 
+ 
+ Deste modo, pode-se comprovar, usando um teste considerado boa prática pela comunidade \cite{elinux}, que o uso do \textit{patch} RT mostrou resultados significativos em relação à previsibilidade de resposta do sistema, obtendo tempo de latência máxima de 247 us após quase 48h de teste.
+ 

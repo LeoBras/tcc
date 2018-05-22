@@ -1,0 +1,124 @@
+\chapter{Fundamentação Teórica}
+Este capítulo aborda os conceitos que serão necessários para entendimento do desenvolvimento do trabalho. 
+
+    \section{Sistema Operacional} 
+        
+Um sistema computacional moderno engloba processador(es), memória, dispositivos de armazenamento, dispositivos de interface com o usuário (como teclado, mouse, \textit{touchpad}, monitor), dispositivos de rede, e outros milhares de periféricos mais específicos geralmente usados através da porta USB (\textit{Universal Serial Bus}). 
+Além disso, para cada uma dessas classes de dispositivo, existem vários padrões de operação que são escolhidos por preferência do fabricante.
+
+Seria muito trabalhoso, se não inviável, modificar a aplicação para cada novo dispositivo de hardware que fosse inserido ou substituído no sistema computacional. Nesse contexto, surge a primeira função de um Sistema Operacional(OS): servir como uma camada de abstração de hardware para o programador [\cite{osT}]. Desse modo, o programador apenas se preocupa em enviar comandos a um dispositivo virtual e genérico, e o SO se encarrega de realizar a conversão desses comandos para o hardware utilizado. 
+Uma demonstração gráfica desse recurso pode ser vista na Figura ~\ref{fig:OS}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=250px]{figuras/OS.png}
+    \caption{Diagrama Simplificado das camadas lógicas de um computador moderno.}
+    \label{fig:OS}
+  \end{center}
+\end{figure}
+
+A segunda função do SO trata do gerenciamento de Recursos de hardware: Enquanto há apenas um processo rodando no sistema computacional, todos os recursos do mesmo estão disponíveis para esse processo. Mas a partir do surgimento da necessidade de se executar dois ou mais processos simultaneamente, há grande complexidade em se fazer gerenciamento inteligente dos recursos utilizados. Nesse ponto, o SO assume a tarefa, realizando o agendamento de uso de memória, tempo de processamento, e uso de periféricos, retirando da aplicação a responsabilidade de gerenciar os recursos disponíveis.
+
+\section{Sistemas de Tempo Real}
+De maneira simplificada, um sistema de Tempo Real (RT) é aquele que exige, da entidade processadora, um limite restrito de tempo entre a aquisição dos dados e a emissão da resposta resultante do processamento dos dados aquisitados [\cite{RTbook}].
+Isso significa que o processamento deve, necessariamente, acontecer durante um determinado intervalo de tempo, cujo início é determinado pela saída do sistema. 
+
+O fato de o processamento não ter sido feito rápido o suficiente, é conhecido como perda de prazo (\textit{deadline miss}). 
+A reação do sistema à perda do prazo pode ser classificada em dois grupos:
+\begin{enumerate}
+  \item \textit{Soft Real-Time}: A perda do prazo, mesmo que em poucas situações, é indesejável, afetando negativamente o resultado do processo. Entretanto, a perda de poucos prazos não desestabiliza o sitema;
+  \item \textit{Hard Real-Time}: Apenas uma perda de prazo tem consequências sérias, podendo inclusive causar instabilidade no sistema, fazendo com que o mesmo se comporte de maneira imprevista.
+\end{enumerate}
+
+\section{Sistemas Operacionais de Tempo Real}
+
+A função do Sistema Operacional de Tempo Real (RTOS) é, além de oferecer os recursos de um Sistema Operacional, suprir de maneira estável as necessidades de sistemas RT. 
+Para isso, nele deve ser implementado um agendador de tarefas preemptivo, que possua a capacidade de interromper uma tarefa de menor prioridade para a execução de uma tarefa com prioridade maior, sem que seja necessária colaboração da tarefa que estava em execução. Isso torna previsível o tempo entre a requisição da tarefa e o seu término. 
+
+Dessa maneira, se a tarefa de maior prioridade estiver associada ao sistema RT, todos os recursos de processamento do sistema estarão disponíveis para que a tarefa possa ser realizada no menor tempo possível, colocando assim todos os esforços da plataforma para realizar a tarefa crítica antes do prazo (\textit{Deadline}).
+
+É muito comum medir o desempenho de um RTOS pelo tempo entre a requisição originada pelo Sistema de Tempo Real e o início da tarefa de processamento relacionada. Esse tempo é conhecido como latência do sistema. A latência representa o intervalo de tempo que o RTOS gasta para detectar o requerimento de tarefa, interromper a tarefa atual e inciar a tarefa de alta prioridade.
+
+
+		\section{FLOSS: \textit{Free and Open Source Software}}
+		
+Segundo a \cite{flossDef}, Software Livre é aquele em que todos os usuários, legalmente, tem todos os seguintes direitos:
+\begin{itemize}
+  \item Executar o programa para qualquer propósito;
+  \item Acesso público ao código fonte;
+  \item Alterar o código da maneira desejada;
+  \item Distribuir as alterações realizadas. 
+\end{itemize}
+
+Esses direitos impactam de maneira positiva sobre projetos de pequeno porte, pois aproveitando as aplicações e ferramentas já implementadas pode-se, com pouco esforço, adaptar o Software Livre já existente para realizar as funções desejadas. 
+Além disso, não há nada que impeça a venda de produtos com Software Livre embarcado, sendo isso um excelente incentivo para jovens empresas na indústria de tecnologia.
+
+Atualmente existem diversas licenças de Software Livre, sendo que cada uma delas tem suas particularidades.
+Algumas delas são mais restritivas, como a GPL (GNU \textit{Public Licence} [\cite{gpl}]), na qual consta a exigência de que todas as modificações realizadas no código sejam compartilhadas, e que os autores sejam mencionados. Outras licenças são mais permissivas, como a Licença BSD (Berkeley \textit{Software Distribution} [\cite{bsd}]), que dá autonomia para que o usuário faça o que desejar com o código, inclusive transformar suas modificações no código em software proprietário. 
+
+Nesse trabalho, a grande maioria do software utilizado é licenciado pela GPL, que é normalmente adotada pelas distribuições Linux.
+ 
+    \section{Linux}
+O Linux é um núcleo de Sistema Operacional compatível com a família de normas IEEE POSIX [\cite{locke2005posix}], e tem vasto suporte a diversas arquiteturas e dispositivos.
+Ele é desenvolvido sob o modelo de desenvolvimento de software livre, e tendo sido publicado sobre a licença GPL, é considerado atualmente o mais bem sucedido SO livre, podendo ser adquirido gratuitamente pela internet. [\cite{focalinux}].
+
+Devido à sua estabilidade, flexibilidade e padronização, o Linux é hoje usado em diversas aplicações, marcando forte presença em supercomputadores (estando em 462 dos 500 mais potentes do mundo [\cite{top500}]) e tendo crescente aceitação no mercado de \textit{SmartPhones} [\cite{MobileStat}], onde é representado pelo Google Android.
+
+
+Além das qualidades citadas previamente, o Linux conta com uma documentação bastante convidativa e uma boa comunidade de suporte, mostrando-se um SO excelente para o desenvolvimento de aplicações embarcadas.
+
+  \section{Distribuições de Software}
+
+O objetivo de uma distribuição de software é facilitar a instalação de aplicativos e ferramentas em um sistema operacional.
+Isso acontece a partir do uso de um repositório de software, do qual o usuário tem a possibilidade de descarregar programas separados em determinadas coleções. Cada coleção tem diferentes objetivos: algumas delas prezam por softwares mais atualizados, enquanto outras priorizam a estabilidade do software utilizado.
+
+Algumas distribuições de software mais conhecidas frequentemente oferecem outros recursos desejáveis:
+\begin{itemize}
+  \item Gerenciador de Pacotes: É uma ferramenta que automatiza a aquisição de pacotes através do repositório e, geralmente, tem recursos de solução de dependência entre pacotes (adquire pacotes necessários para o funcionamento do pacote desejado);
+  \item Pacotes Binários: A distribuição oferece os pacotes de software já pré-compilados e prontos para o uso.
+  \end{itemize}
+
+Com o objetivo de evitar a concentração de tráfego de dados no servidor do repositório, as distribuições mais conhecidas recebem suporte de espelhos (\textit{mirrors}), que são cópias exatas e verificadas do servidor original.
+
+ \section{Interpretador de Comandos: \textit{Shell}}
+
+A função do interpretador de comandos (\textit{Shell}) é, como o nome deixa claro, interpretar os comandos enviados pelo usuário para o OS, servindo assim como interface que torna direta a comunicação entre estes [\cite{bLp}].
+
+O \textit{Shell} é, até a data de elaboração deste trabalho, a principal interface entre os sistemas Linux embarcados e o usuário, portanto seu uso é bastante requisitado nesse tipo de projeto. A partir do \textit{Shell} é possível executar diversos aplicativos e utilizar basicamente todas as ferramentas disponíveis no sistema. 
+
+No intuito de realizar tarefas repetitivas de maneira automática, pode-se fazer um \textit{Shell Script}. Seu funcionamento é simples: basta abrir qualquer editor de texto e escrever os comandos que devem ser realizados, na ordem desejada e separando-os por linha e salvá-los em um arquivo. Feito isto, basta conceder permissão para que o sistema operacional use arquivo de \textit{Shell Script} como executável, e as tarefas nele descritas serão realizadas automaticamente. Comandos de condição (\textit{if, else}) e laço (\textit{for, while, until}) também estão disponíveis para a construção do \textit{script}.
+
+    
+\section{Microcontroladores ARM}
+
+ARM (\textit{Advanced RISC Machines}) é uma arquitetura de microprocessadores em crescente desenvolvimento, que conta com as seguintes características [\cite{armBook}]:
+\begin{itemize}
+  \item Construída sobre o Design RISC (\textit{Reduced Instruction Set Computer}) : visa proporcionar um conjunto com comandos reduzido, que sejam mais rápidos e possam ser organizados de forma a gerar instruções complexas mais flexíveis;
+  \item Alguns Conceitos não RISC: Possui chaveamento para realizar algumas instruções complexas e instruções estendidas para processamento numérico de alto desempenho;
+  \item Eficiência Elétrica: Projetada para ter baixo consumo e medidas mecânicas reduzidas, é ideal para equipamentos móveis;
+  \item Alta Densidade de Código: O arquivo executável (binário) ocupa menos espaço em memória, o que é desejável em sistemas mais limitados.
+\end{itemize}
+
+Entretanto, para manter o baixo consumo elétrico, a maioria dos processadores ARM não dispõem de grande poder de processamento. A geração de binários, se realizada nativamente no ARM, pode ser bastante demorada e até inviável. Portanto é prática bastante comum a compilação cruzada (\textit{Cross-Compiling}), que visa usar máquinas de maior desempenho a fim de gerar binários que podem ser executados na arquitetura ARM.
+
+\section{Plataforma Embarcada com Linux}
+
+No geral, as plataformas com Linux embarcado contém os seguintes componentes de software: 
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=450px]{figuras/Embedded.png}
+    \caption{Diagrama Simplificado da comunicação entre os componentes de uma plataforma com Linux embarcado.}
+    \label{fig:embedded}
+  \end{center}
+\end{figure}
+ 
+\begin{itemize}
+  \item \textit{Root FileSystem} (RootFS): É a partição onde ficam os arquivos básicos do sistema, e geralmente todas as ferramentas e aplicações disponíveis pelo sistema. Essa partição pode opcionalmente guardar aquivos modificados, e ser usada para descarregar novos softwares. É essencial para o funcionamento do sistema operacional;
+  \item \textit{Kernel} Linux: É o núcleo do SO Linux, onde estão disponíveis as principais ferramentas de gerenciamento de hardware;
+  \item Gerenciador de Boot (\textit{Bootloader}): Software responsável por indicar a localização do \textit{Kernel} e do RootFS, de modo que o OS possa ser iniciado. Alguns \textit{Bootloaders} tem recursos avançados como suporte a rede e passagem de variáveis ao \textit{kernel};
+  \item \textit{Bootstrap}: Presente em alguns casos, esse software realiza o carregamento do \textit{Bootloader}.
+
+\end{itemize}
+
+
+Na Figura \ref{fig:embedded} é mostrada a comunicação entre os componentes da Plataforma Embarcada com Linux.

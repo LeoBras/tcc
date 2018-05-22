@@ -1,0 +1,56 @@
+\chapter{Introdução}
+\label{cap:intro}
+
+
+Nas duas últimas décadas, a utilização de Microcontroladores para Automação de Processos se tornou muito popular por sua elevada eficiência e custo reduzido. 
+Dentre os microcontroladores mais simples, como o 8051 e alguns PICs (\textit{Programmable Interface Controller}), é comum desenvolver as funcionalidades da aplicação usando linguagem C, ou, às vezes, simplesmente linguagem \textit{Assembly}. Graças ao uso dessas linguagens de baixo nível é possível ter uma eficiente previsibilidade dos tempos de execução das aplicações desenvolvidas.
+
+Ao longo dos anos, em busca de ganhos elevados de velocidade e eficiência, os microcontroladores vem sofrendo modificações que se inclinam para aumento de Conjunto de Comandos, Espaço de Endereçamento e Frequência de operação, além de modificações que incluem novos recursos mais avançados. 
+Algumas dessas modificações, entretanto, tornam a programação do microcontrolador mais complexa, resultando na inviabilidade do uso de linguagens de baixo nível para sua programação.
+
+Para auxiliar na solução do problema da complexidade, utiliza-se cada vez mais Sistemas Operacionais (SO) reduzidos, que ficam responsáveis por administrar os recursos da plataforma, e sobre os quais é realizado o desenvolvimento da aplicação desejada. 
+No contexto geral, esse conceito trouxe grandes melhorias, inclusive no tempo de desenvolvimento [\cite{osT}]. No entanto, uma vez que os tempos e recursos do sistema não ficam mais sob controle do desenvolvedor, não há como garantir a previsibilidade dos tempos de execução das aplicações.
+
+Para suprir a necessidade de algumas aplicações que precisam de previsibilidade de resposta (chamadas aplicações de Tempo Real) [\cite{RTbook}], foram propostos os Sistemas Operacionais de Tempo Real (RTOS), que, para determinadas tarefas, tem a função de garantir que o sistema responda com um tempo previsível, e quando possível, reduzido.
+
+Anteriormente, além do custo elevado de Microcontroladores de alto desempenho, os RTOS, que funcionavam sobre estes, constituíam-se principalmente de softwares proprietários, fechados e com alto custo de aquisição, o que limitava o uso dessas plataformas às grandes corporações.
+Hoje, com a incrível redução de preços dos microcontroladores de alto desempenho, e o surgimento de algumas alternativas de RTOS em Software Livre, fez-se possível a exploração desses recursos para projetos de baixo custo.
+ 
+A rápida evolução dos Microcontroladores nos últimos anos acontece também devido ao crescente mercado de \textit{Smartphones} e \textit{Tablets}. Esse mercado busca, cada vez mais, elevar o poder de processamento, reduzir a potência consumida e reduzir o custo de seus dispositivos. 
+Assim, tal mercado optou por adotar, em sua maioria, o uso da arquitetura de microcontroladores ARM (\textit{Advanced RISC Machines}) para seus produtos, e por isso o preço e a disponibilidade desses microcontroladores os tornaram interessantes para o desenvolvimento de projetos mais simples.
+
+Além disso, o próprio mercado de \textit{Tablets} e \textit{Smartphones}, visando reduzir seu custo, tem investido bastante no desenvolvimento de software livre, sendo o Linux o maior beneficiado: 
+mais de 64\% dos Celulares vendidos no segundo trimestre de 2012 carregam o Android [\cite{MobileStat}], o SO do Google que utiliza kernel Linux, sendo que este, atualmente, é o mais bem sucedido projeto de SO Livre. Devido ao fato de seu código fonte ser aberto ao público e possuir uma boa documentação, há muita facilidade em adaptá-lo a necessidades particulares.
+
+Nesse contexto, unindo a disponibilidade de microcontroladores com o crescente desenvolvimento do software livre, é viável a utilização do Linux em Sistemas Embarcados para realização de automação e controle de sistemas, incluindo os de tempo real.
+
+
+\section{Objetivos} 
+
+Tendo em vista o cenário atual para desenvolvimento em plataformas embarcadas, o principal objetivo deste trabalho é desenvolver uma Plataforma de Automação com as seguintes características:
+
+\begin{itemize}
+\item Caracterize-se por um baixo custo de implementação;
+\item Tenha embarcado o sistema operacional Linux, com uma distribuição estável;
+\item Funcione a partir de um microcontrolador ARM de bom desempenho e baixo custo;
+\item Seja controlável via internet, através de uma interface Web;
+\item Ofereça uma segura previsibilidade de tempos de execução, ou seja, comporte-se como um RTOS;
+\item Seja altamente personalizável.
+
+\end{itemize}
+
+
+\section{Justificativa}
+
+O desenvolvimento de uma plataforma de automação de baixo custo, que usufrua de RTOS deve possibilitar a oportunidade de desenvolvimento de aplicações para automação, de forma geral, hoje ainda pouco exploradas com esse conceito.
+
+
+\section{Organização do Trabalho}
+Este trabalho está estruturado por capítulos, sendo eles divididos da seguinte maneira:
+ 
+\begin{itemize}
+  \item Fundamentação Teórica: Apresentação dos conceitos relevantes para o correto entendimento do presente trabalho;
+  \item Metodologia: Apresentação dos materiais e métodos utilizados no trabalho;
+   \item Resultados: Discussão e apresentação dos resultados obtidos a partir da Metodologia usada;
+   \item Conclusão: Validação dos objetivos do trabalho, análise de aplicabilidade e conclusões finais.
+\end{itemize}

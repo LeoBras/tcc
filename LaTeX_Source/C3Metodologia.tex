@@ -1,0 +1,320 @@
+\chapter{Materiais e Metodologia}
+Este capítulo divide a metodologia utilizada em duas sessões: a primeira apresenta os materiais utilizados, englobando hardware e software. A segunda aborda os métodos utilizados para a obtenção dos resultados. 
+
+\section{Materiais Usados}
+Nesta sessão são apresentados os materiais utilizados na construção do trabalho. O principal hardware utilizado foi o Kit de Desenvolvimento SAM9-L9260 (descrito na Seção ~\ref{sec:kit}), enquanto os principais softwares utilizados foram o código fonte do Linux (Seção ~\ref{sec:linuxsrc}), o \textit{patch} RT (Seção ~\ref{sec:patchsrc}) e a ferramenta de testes CyclicTest (Seção ~\ref{sec:cyclic}).
+
+\subsection{Kit de Desenvolvimento SAM9-L9260}
+\label{sec:kit}
+Com o intuito de evitar o trabalho relacionado à montagem de hardware, foi adquirido o kit de desenvolvimento da Olimex® SAM9-L9260, que contém um microcontrolador ARM embarcado, bem como memórias volátil e NAND Flash. As configurações mais relevantes ao trabalho estão descritas a seguir [\cite{kitMan}]:
+
+\begin{itemize}
+  \item  MCU AT91SAM9260 de 16/32 bits arquitetura ARM9\texttrademark \ rodando a 200MHz;
+  \item  Frequência principal do sistema igual a 50MHz;
+  \item  64 MB SDRAM;
+  \item  512MB NAND \textit{Flash} para armazenamento (RootFS);
+  \item  Conector \textit{Ethernet} 100Mbit;
+  \item  Conectores USB \textit{host} (tipo B) e USB \textit{device} (tipo A);
+  \item  Interface Serial (RS232), usada como terminal serial;
+  \item  Conector para cartões de memória SD/MMC;
+  \item  \textit{Bootloader} uBoot, e \textit{Bootstrap} já configurados;
+  \item  \textit{Kernel} Linux 2.6.31-rc3 customizado;
+  \item  Distribuição de Software Debian versão 4.0 codinome "Etch". 
+\end{itemize}
+
+A Figura \ref{fig:SAM} mostra visões de perspectiva isométrica (esquerda) e visão de fundo (direita) da placa utilizada.
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=450px]{figuras/olimex.png} 
+    \caption{Fotos do Kit SAM9L9260.[\cite{kitMan}] }
+    \label{fig:SAM}
+  \end{center}
+\end{figure}
+O \textit{uBoot} permite \textit{download} de kernel via protocolo TFTP (\textit{Trivial File Tranfer Protocol}), e oferece a possibilidade de usar um Root FileSystem (RootFS) a partir de cartão de memória SD/MMC ou Pendrive (USB \textit{device}) ao invés da NAND \textit{Flash} interna.
+
+\subsection{Código Fonte do \textit{Kernel} Linux}
+\label{sec:linuxsrc}
+
+O código fonte do \textit{Kernel} Linux está disponível na internet [\cite{linuxSource}]. O download pode ser realizado também em um dos espelhos disponibilizados nesse mesmo endereço.
+A partir do código foram feitas as modificações necessárias para tornar o Linux um RTOS. 
+
+A versão escolhida para a execução do trabalho foi a 3.4.9, sendo esta a versão mais nova que mantinha compatibilidade com o \textit{patch Real-Time}, considerando o período em que ocorreu a execução deste trabalho.
+
+\subsection{\textit{Patch Real Time} para Linux}
+\label{sec:patchsrc}
+\textit{Patch} é um arquivo que traz algumas modificações que podem ser aplicadas ao código fonte de um software para fazê-lo realizar tarefas diferentes, corrigir algum defeito, ou adicionar suporte a novas plataformas. Quando o \textit{patch} atinge um certo nível de maturidade e relevância para o projeto original geralmente ele é absorvido e se torna uma opção de configuração a mais na hora da compilação. 
+
+A função desse \textit{patch} é aumentar a preempção do Linux, permitindo melhor atendimento das tarefas de alta prioridade. Isso é feito na tentativa de adaptar o Linux para que ele funcione como um Sistema Operacional de Tempo-Real. O \textit{patch} RT é um projeto oficial do Kernel.org e o \textit{Wiki} do projeto está disponível na internet [\cite{rtpatch}].
+
+\subsection{Ferramenta de Testes \textit{Cyclictest}}
+\label{sec:cyclic}
+Cyclictest é uma ferramenta usada para levantar estatísticas sobre os tempos de latência da plataforma em que é executado. 
+Essa ferramenta é recomendada pela comunidade Embedded Linux [\cite{elinux}] como uma boa prática de teste para sistemas RT.
+
+O Cyclictest funciona requerendo, em uma frequência definida e bastante precisa, que o OS realize uma tarefa de alta prioridade. O tempo de latência é então calculado e armazenado. Ao final do teste tem-se o valor máximo, mínimo, médio e o número de vezes que a tarefa foi requerida.
+
+
+\section{Métodos Usados}
+Nesta sessão são explicados os métodos utilizados para a obtenção dos resultados, onde as Seções de \ref{ss:CC} até \ref{ss:startup} explicam os como foi feita a geração e a configuração da plataforma, enquanto a Seção \ref{ss:teste} explica os procedimentos de teste.
+\subsection{Compilação Cruzada}
+	\label{ss:CC}
+Antes de iniciar a explicação sobre a compilação cruzada, é necessário salientar que em necessidade de executar algum processo como super-usuário ou administrador (\textit{root}), os seguintes comandos foram usados antes do início do bloco:
+
+
+ \begin{lstlisting}
+ sudo su  #(sistemas com sudo instalado) ou
+ su       #(sistemas sem sudo instalado).
+ \end{lstlisting}
+
+Nada impede de que todos os processos sejam executados como root, mas por boa prática serão citados aqueles que exigem esse nível de privilégio.
+
+A primeira etapa foi obter o código fonte do \textit{Kernel} Linux e prepará-lo para aplicação do patch. Para isso, seguiu-se os seguintes passos:
+
+
+ \begin{lstlisting}
+  # Realiza o Download do Linux versão 3.4.9.
+  wget http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.4.9.tar.xz
+  # Extrai o pacote em uma pasta de mesmo nome:
+  tar -xJf linux-3.4.9.tar.xz
+  # Para entrar na pasta referente:
+  cd linux-3.4.9
+  \end{lstlisting}
+
+A próxima etapa foi obter o arquivo de \textit{patch} e aplicá-lo ao código do Linux:
+
+
+ \begin{lstlisting}
+# Realiza o Download do Patch RT para o Linux 3.4.9
+  wget http://www.kernel.org/pub/linux/kernel/projects/rt/3.4/older/patch-3.4.9-rt17.patch.xz
+# Extrai o Patch
+  xz -d patch-3.4.9-rt17.patch.xz
+# Aplica o patch ao código.
+  patch -p1 < patch-3.4.9-rt17.patch 
+  \end{lstlisting}
+
+
+Com esses comandos, o código do Linux foi alterado com as modificações propostas pelo \textit{patch}. 
+Antes de continuar, foi necessário instalar alguns pacotes para possibilitar a compilação cruzada entre o computador usado e o kit de desenvolvimento. Os comandos a seguir foram usados em distribuições Debian ou descendentes (como o Ubuntu) que usam gerenciador de pacotes APT (\textit{Advanced Packaging Tool}). Caso seja necessário realizar esse processo em outra distribuição é indicado usar o gerenciador de pacotes da mesma, ou o processo por ela indicado para realizar a instalação. 
+
+
+ \begin{lstlisting}
+# Os comandos a seguir devem ser executados como Super-Usuário.
+# Instalando o Compilador Cruzado 
+ apt-get install gcc-arm-linux-gnueabi
+# Instalando bibliotecas básicas para compilar o kernel.
+ apt-get install gcc make libncurses-dev
+# Instalando bibliotecas necessárias para usar o configurador gráfico do kernel. (Opcional)
+ apt-get install libqt4-dev
+ \end{lstlisting}
+
+Nesse ponto iniciou-se a configuração do Linux para o kit de desenvolvimento utilizado. A linha 8 gera a configuração padrão do kit, e foi obtida em seu manual [\cite{kitMan}].
+
+\newpage
+ \begin{lstlisting}
+# Limpa qualquer tentativa de compilação anterior.
+ make clean  
+# Exporta as variáveis para a Compilação Cruzada.
+export ARCH=arm
+export CROSS_COMPILE=arm-linux-gnueabi-
+
+# Aplica a configuração de compilação padrão do Kit.
+  make sam9_l9260_defconfig
+# Para configurar o Linux com a ferramenta gráfica:
+  make xconfig
+# Para configurar o Linux com a ferramenta de texto:
+  make menuconfig
+ \end{lstlisting}
+
+Para a configuração deste Kit foi necessário adicionar configurações específicas, sendo algumas para funcionamento em geral e outras para o funcionamento em Real-Time. Para mais detalhes veja o Apêndice \ref{ap:kernel}.
+
+Uma vez acabados os ajustes, foram executados os seguintes comandos para realizar a compilação do Linux e a sua cópia para a pasta atual:
+
+
+ \begin{lstlisting}
+# Realiza a compilação, usando os 4 núcleos do processador para reduzir o tempo,
+  make uImage -j4
+# Move o Linux compilado para o diretório atual,
+  mv arch/arm/boot/uImage .
+ \end{lstlisting}
+ 
+   Para finalizar, foi necessário mover o arquivo uImage para um servidor de TFTP(\textit{Trivial File Tranfer Protocol}), de onde ele pudesse ser obtido pelo \textit{uBoot}. O endereço IP do servidor era 10.235.0.130. Para mais detalhes, veja o Apêndice \ref{ap:tftp}.
+  
+
+\subsection{Criação do \textit{Root FileSystem}}
+	\label{ss:rootfs}
+Para a criação do \textit{Root FileSystem} (RootFS) foi usada uma ferramenta da Distribuição Debian (que também está presente nas distribuições descendentes) chamada Debootstrap. Esta ferramenta usa os repositórios da distribuição Debian (ou descendentes) para montar um RootFS básico. 
+ Além desta, foi necessário instalar algumas ferramentas de emulação para concluir a configuração do Debian, de modo a transferir o RootFS pronto para o Kit. Os procedimentos de configuração são mostrado nos trechos de código a seguir:
+
+
+ \begin{lstlisting}
+# Os comandos a seguir devem ser executados como Super-Usuário.
+#Instala o Debootstrap e os emuladores (qemu).
+ apt-get install binfmt-support qemu qemu-user-static debootstrap
+ \end{lstlisting}
+
+
+Após o término da instalação, via APT, do Debootstrap e das ferramentas de emulação, criou-se uma pasta onde foi feito o processo do Debootstrap. O processo foi realizado como mostrado a seguir:
+
+
+ \begin{lstlisting}
+# Os comandos a seguir devem ser executados como Super-Usuário.
+# Criando e entrando na pasta usada no Debootstrap:
+ mkdir Debootstrap
+ cd Debootstrap
+# Usando o Debootstrap para criar, na pasta debian, um RootFS da Versão Wheezy (7.0) usando a arquitetura armel (ARM),a partir do espelho da USP do repositório Debian.
+ debootstrap --foreign --arch armel wheezy debian/ http://sft.if.usp.br/debian/
+\end{lstlisting}
+
+O próximo passo foi usar a pasta debian como RootFS e realizar a emulação da plataforma ARM para terminar a configuração. Para isso, foi necessário copiar o emulador para dentro da pasta debian, pois caso contrário a emulação falharia:
+
+ \begin{lstlisting}
+# Os comandos a seguir devem ser executados como Super-Usuário.
+# Copia o emulador para a pasta debian.
+  cp /usr/bin/qemu-arm-static debian/usr/bin/
+# O comando a seguir exporta algumas variaveis e usa o comando chroot para iniciar a emulação de um Microcontrolador ARM.
+  DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true LC_ALL=C LANGUAGE=C LANG=C chroot debian/
+
+# Dentro da emulação, instala-se todos os pacotes DEB baixados com o comando debootstrap
+dpkg --force-all -i /var/cache/apt/archives/*.deb
+
+# Caso ocorra algum erro na configuração do base-files. comente esta linha (coloque um # antes de rmdir) para corrigir o bug.
+# O comando a seguir o levará diretamente na linha 30, que precisa ser comentada.
+  nano +30 /var/lib/dpkg/info/base-files.postinst 
+# ctrl+o para salvar e ctrl+x para sair.
+ \end{lstlisting}
+
+
+Para possibilitar o uso do APT, adicionou-se os endereços dos repositórios de onde poderia ser feita a aquisição de pacotes. O repositório escolhido foi o da USP por se mostrar com maior taxa de transferência dentro do campus. O procedimento é mostrado a seguir:
+
+ \begin{lstlisting}
+# Adiciona o repositório SFT da USP na lista de repositórios.
+  echo "deb http://sft.if.usp.br/debian wheezy main contrib non-free" > /etc/apt/sources.list
+# Baixa a listagem do repositório e realiza as atualizações, além de corrigir os possíveis problemas com o base-files.
+  apt-get update && apt-get dist-upgrade -y
+#Para sair da emulação, use o comando exit
+exit
+ \end{lstlisting}
+Após terminada a emulação, a pasta debian continha todos os recursos básicos para, juntamente com um kernel, iniciar o sistema operacional. 
+Por fim, foram transferidos os conteúdos da pasta debian para um \textit{pendrive}, que foi usado no processo de \textit{boot}.
+
+ \begin{lstlisting}
+# Os comandos a seguir devem ser executados como Super-Usuário.
+# Formata (em EXT3) o pendrive (/dev/sdb) 
+  mkfs.ext3 -L "pendrive"  /dev/sdb
+# Monta o pendrive na pasta /media/pendrive
+  mount -t ext3 /dev/sdb /mnt/
+# Copia conteúdo do RootFS para o pendrive.
+  cp -r debian/* /mnt/
+  umount /dev/sdb
+ \end{lstlisting}
+	
+\subsection{Iniciando o Sistema}
+\label{ss:startup}
+  
+Foi necessário conectar, através de um cabo serial, o kit e um computador de mesa a fim de usar um emulador de terminal serial (Minicom, Teraterm) para alterar as configurações do \textit{uBoot}. O emulador foi ajustado nas seguintes configurações:
+  
+  \begin{itemize}
+    \item \textit{Baud Rate}: 115200;
+    \item Bits de Dados: 8;
+    \item \textit{Stop} Bits: 1;
+    \item Sem controle de fluxo.
+  \end{itemize}
+
+Ao ligar a placa, apareceu a opção de cancelar o \textit{boot} automático. Quando cancelado, foi mostrado o terminal do \textit{uBoot}, onde foram feitas as configurações para realizar o \textit{boot} a partir do Kernel presente no servidor TFTP e o RootFS do \textit{pendrive}. Uma vez que o arquivo \textit{uImage} já estava no servidor TFTP e o \textit{pendrive} já havia sido construído, bastou inserir-lo na entrada USB da placa (USB \textit{device}), conectar o cabo de rede e usar os seguintes comandos de configuração (adaptados de [\cite{kitMan}]):
+
+  \begin{lstlisting}
+# Aponta o local do servidor 
+  setenv serverip 10.235.0.130
+# Atribui o endereço local
+  setenv ipaddr 10.235.0.136
+# Descarrega o uImage via TFTP e o carrega no endereço 0x22200000
+  tftpboot 22200000 10.235.0.130:uImage
+# Ajusta a localização do RootFS para o pendrive (/dev/sda1)
+  setenv bootargs mem=64M console=ttyS0,115200 root=/dev/sda rootdelay=10
+# Realiza o Boot
+  bootm
+ \end{lstlisting}
+
+Foi então realizado o \textit{boot} da maneira desejada e o Sistema Operacional iniciou como esperado. Para listar as características do mesmo foi usado o comando \textit{uname}:
+
+
+  \begin{lstlisting}
+# Comando para listar características do OS, 
+  uname -a
+# Retorno
+"Linux SAM9-L9260 3.4.9-rt17 #11 PREEMPT RT Mon Sep 10 17:25:28 BRT 2012 armv5tejl GNU/Linux"
+ \end{lstlisting}
+
+ A partir destas listagens pode-se verificar que o processo de construção do Linux RT ocorreu com sucesso.
+ 
+
+\subsection{Testes de Desempenho}	
+Nesta Seção são detalhados os procedimentos de teste utilizados para demonstrar as características obtidas pelo Linux após a configuração e a aplicação do \textit{patch} RT.
+
+  \label{ss:teste}
+	\subsubsection{Teste de \textit{Clock}}
+
+O teste de \textit{clock} foi um teste que teve por objetivo de verificar a diferença ocasionada pelo uso do comando \textit{chrt} no comportamento do ambiente em diferentes situações. 
+
+A função do comando \textit{chrt} é manipular os atributos RT de um processo, aumentando ou diminuindo a sua prioridade de execução. Através dele é possível selecionar os processos que serão vinculados ao sistema de tempo real, e portanto serão prioritários [\cite{siever2009linux}].
+
+O teste gerava sinal de \textit{clock} a partir de um pino de GPIO(\textit{General Purpose Input Output} - Pino de uso geral) o mais rápido possível. Com o auxílio de um osciloscópio, mediu-se o período de meia onda, que representa o tempo de chaveamento do GPIO.
+
+Para isso, dois meios foram propostos para gerar o sinal: \textit{Bash Script} e um programa escrito em linguagem C.
+Cada um desses meios foi testado de três maneiras:
+\begin{enumerate}
+  \item Usando o Linux com o \textit{patch} RT, sem alterar a prioridade da tarefa, que tem o mesmo resultado do Linux sem o \textit{patch} RT;
+  \item Usando o Linux sem o \textit{patch} RT,  alterando a prioridade da tarefa para o máximo (\textit{chrt});
+  \item Usando o Linux com o \textit{patch} RT, alterando a prioridade da tarefa para o máximo (\textit{chrt}).
+\end{enumerate}
+
+A partir desses valores foi possível perceber a influência do \textit{patch} nas temporizações do Linux, e também os efeitos provocados pelo comando \textit{chrt} no comportamento do Linux. Os tempos observados nesses testes foram referenciados como "períodos de meia onda", e equivalem ao tempo que leva ao ambiente realizar uma troca de valores em um GPIO.
+Os detalhes sobre a codificação do teste podem ser encontrados no Apêndice \ref{ap:clk}.
+
+  \subsubsection{Teste de Latência por GPIO}
+
+Esse teste já foi um pouco mais elaborado, e teve por objetivo encontrar, no kit testado, o tempo entre a recepção de um sinal por um pino de entrada e a resposta a esse sinal por um pino de saída. Esse tempo é denominado tempo de resposta do ambiente. 
+
+O sinal de entrada era proveniente do pino de GPIO de um Kit Auxiliar, e tinha a forma de onda quadrada com período de 2ms. A resposta aparecia a cada borda de transição do sinal de entrada, e era dada na forma de um pulso. Ambas entrada e saída foram colocadas nos dois canais de um osciloscópio, que foi colocado em modo de persistência infinita de imagem, e teve o \textit{trigger} fixado nas bordas de transição da entrada. Isso ocasionou que todos os pulsos de saída fossem marcados na imagem, possibilitando a medida dos tempos de resposta. O diagrama de montagem do teste é representado na Figura \ref{fig:gpiotest}.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=250px]{figuras/teste_gpio.png}
+    \caption{Diagrama de Montagem do teste de GPIO.}
+    \label{fig:gpiotest}
+  \end{center}
+\end{figure}
+
+
+
+O teste foi aplicado em duas versões do Linux: uma com o \textit{patch} RT, e a outra sem o \textit{patch} RT, sendo que em cada versão o teste foi feito com o ambiente sobrecarregado de tarefas e repetido com operação em baixa carga.
+
+Esse teste foi muito importante, por representar uma situação realística de aplicação da plataforma para automação.
+
+Através de experiências empíricas, percebeu-se que infelizmente o teste não poderia ter duração muito longa, já que este utilizava a função de persistência de imagem no osciloscópio. Assim, a imagem poderia ser borrada por perda de sincronia, ocasionada por algumas oscilações na rede, ou quaisquer fatores externos. 
+
+Os tempos observados nesses testes serão referenciados como "tempos de resposta", e são referentes à soma dos tempos de latência e de alternância de nível no pino do GPIO.
+
+Mais detalhes sobre a construção do teste encontram-se no Apêndice \ref{ap:gpio}. 
+		
+  \subsubsection{\textit{CyclicTest}}
+  
+  Antes de usar o \textit{CyclicTest}, melhor explicado na sessão \ref{sec:cyclic} , foi necessário obter o código fonte dos repositórios \textit{Kernel.org} e compilá-lo no Kit já em funcionamento. O processo de compilação é simples e pode ser visto no Apêndice \ref{ap:cycl}.
+  
+  Uma vez compilado e instalado, o CyclicTest foi chamado da seguinte maneira:
+  
+     \begin{lstlisting}
+  time cyclictest -m -a -t -n -p99
+ \end{lstlisting}
+	
+Onde:
+\begin{itemize}
+  \item \textit{time}: Comando que executa o comando a seguir e retorna o tempo levado para sua execução;
+  \item -m : Trava as alocações de memória da maneira atual. Necessário para evitar erros de Segmentação;
+  \item -a : Indica para todos os testes serem feitos com processador 1;
+  \item -t : Usa uma \textit{thread} por processador, pois o sistema possui apenas 1 \textit{thread};
+  \item -n : Faz a temporização com a função \textit{nanosleep()}, que é mais precisa;
+  \item -p99 : Aumenta a prioridade do teste ao máximo, ou seja, o mesmo não pode ser interrompido, e sempre interrompe qualquer outra tarefa.
+\end{itemize}
+
+Por padrão, o \textit{CyclicTest} executa um teste a cada 1ms e usa cada tempo medido para realizar as estatísticas do teste.

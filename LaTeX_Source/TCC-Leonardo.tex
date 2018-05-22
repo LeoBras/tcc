@@ -1,0 +1,86 @@
+% ---------------------------------------------------------
+% Estilo, Pacotes e Definições Prévias
+% ---------------------------------------------------------
+
+\documentclass[tese]{tese_eesc}
+\usepackage[brazilian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{natbib} 
+%mathpazo % Muda a fonte para Palatino
+\usepackage{array,rotating,setspace,enumerate} 
+\usepackage{float,amssymb,amstext}
+\usepackage[cmex10]{amsmath}
+\usepackage{booktabs,multirow,dcolumn}
+\usepackage{pstricks,pst-node,pst-coil,pst-plot,pst-tree}
+\usepackage{subfig,remreset}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Algoritmo para encapsular código %%%%% 
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ 
+\lstset{
+  language=bash,                
+  basicstyle=\footnotesize,           
+  numbers=left,                   
+  numberstyle=\tiny\color{gray},  
+  stepnumber=1,                             
+  numbersep=5pt,                  
+  backgroundcolor=\color{white},    
+  showspaces=false,               
+  showstringspaces=false,         
+  showtabs=false,                 
+  frame=single,                   
+  rulecolor=\color{black},        
+  tabsize=2,                      
+  captionpos=,                   
+  breaklines=true,                
+  breakatwhitespace=false,        
+  title=\lstname,                               
+  keywordstyle=\color{blue},          
+  commentstyle=\color{dkgreen},       
+  stringstyle=\color{mauve},     
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{definicoes.tex}
+
+% ---------------------------------------------------------
+% Informações da Tese (Título, Nomes, Palavras-chave, ...)
+% ---------------------------------------------------------
+\input{infos.tex}
+
+
+% ---------------------------------------------------------------
+% Elementos Pré-textuais e Listas de Figuras, Tabelas, e Sumário
+% ---------------------------------------------------------------
+
+\begin{document}
+\maketitle
+\input{pre_textuais.tex}											% REVISADO
+\tableofcontents
+
+
+% ---------------------------------------------------------
+% Corpo do trabalho (capitulos)
+% ---------------------------------------------------------
+
+\input{C1Introducao.tex}
+\input{C2Fundamentacao.tex}
+\input{C3Metodologia.tex}
+\input{C4Resultados.tex}
+\input{C5Conclusao.tex}
+\input{C6Referencias.tex}
+\input{C7ApendicesAnexos.tex}
+
+
+
+\end{document}

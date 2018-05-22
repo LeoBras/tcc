@@ -1,0 +1,328 @@
+\apendices
+
+\chapter{Configuração do Kernel Linux}
+\label{ap:kernel} 
+
+Para configurar a o \textit{Kernel} Linux para funcionar no Kit SAM9-L9260 foram necessárias as seguintes configurações na etapa de \textit{make xconfig} ou \textit{make menuconfig}:
+
+Em \textit{General Setup},
+\begin{itemize}
+  \item Troque o \textit{Kernel Compression} de Gzip para LZMA (melhor compactação),
+  \item Desabilite \textit{Support for paging of anonymous memory (swap)},
+  \item Desabilite \textit{Initial RAM filesystem and RAM disk (initramfs/initrd) support},
+  \item Habilite \textit{Optimize for size},
+\end{itemize}
+
+Em \textit{Kernel Features},
+\begin{itemize}
+  \item Habilite \textit{High Resolution Timer Support},
+  \item Em \textit{Preemption Model}, selecione \textit{Fully Preemptible Kernel (RT)} (Essa opção habilita o patch RT. No teste que não foi usado o patch, bastou comentar essa opção),
+  \item Habilite \textit{Use the ARM EABI to compile the kernel} e sua sub-opção.
+\end{itemize}
+
+Em \textit{Device Drivers}, 
+\begin{itemize}
+  \item Em \textit{Memory Technology Device (MTD) support}, habilite a opção \textit{NFTL (NAND Flash Translation Layer) support},
+  \item Em \textit{Misc Devices}, habilite a opção \textit{Atmel AT32/AT91 Timer/Counter Library },
+  \item Em \textit{Network device support}, desabilite \textit{Wireless LAN },
+  \item Em \textit{GPIO Support}, habilite \textit{/sys/class/gpio/... (sysfs interface)}.
+\end{itemize}	
+	
+
+\chapter{Servidor TFTP}
+\label{ap:tftp} 
+	O servidor usado nesse trabalho roda a Distribuição Debian Squeeze, onde foi feita a instalação do serviço de servidor TFTP(\textit{Trivial File Tranfer Protocol}). A instalação do servidor foi feita da maneira listada a seguir:
+	
+\begin{lstlisting}
+# Esses comandos precisam ser executados como Root ou Super-Usuário
+  apt-get install tftpd-hpa
+# Nesse processo será criada a pasta /var/lib/tftpboot, que funcionará como seu servidor TFTP. Caso queira possibilitar acesso e escrita a todos os usuários, use o comando:
+  chmod 777 /var/lib/tftpboot
+# Para simplificar, é possível criar um link para essa pasta no diretório raiz,
+  ln -s /var/lib/tftpboot /tftp
+\end{lstlisting}
+
+Para colocar os arquivos no servidor TFTP, por simplicidade foi usado o scp:
+
+\begin{lstlisting}
+  scp uImage usuario@10.235.0.130:/tftp/
+  #Onde uImage é o Linux modificado,
+  #10.235.0.130 é o servidor
+  # e /tftp/ é a pasta do servidor TFTP.
+\end{lstlisting}
+
+	
+\chapter{Teste de Clock}
+\label{ap:clk}
+
+O teste de clock escrito em C foi compilado a partir do Kit, com conta de root. 
+Bastou-se realizar os seguintes comandos:
+
+\begin{lstlisting}
+# Abrindo aquivo para edição,
+ nano clock.c
+ \end{lstlisting}
+
+Dentro do editor, foi escrito o seguinte:
+\lstset{language=C}
+\begin{lstlisting}
+#include <stdint.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <poll.h>
+#include <unistd.h>
+
+//Seleciona o Pino de GPIO
+static const char *gpio_out = "/sys/class/gpio/gpio74/value";/*PB10*/ 
+
+int main (void)
+{
+  system("echo 74 > /sys/class/gpio/export");
+  system("echo out > /sys/class/gipo/gpio74/direction");
+  
+  	mlockall(MCL_CURRENT | MCL_FUTURE); //bloqueia toda a memoria mapeada nesse processo 
+	
+	fd_output = open(gpio_out,  O_RDWR); //Abre o File Descriptor
+	if (fd_output < 0)    //Verifica se houve erro.
+		printf("can't open gpio_out");
+	
+		while (1)
+		{
+			write(fd_output,"1",2);			/* Escreve "1"*/
+			write(fd_output,"0",2);			/* Escreve "0"*/
+		}
+		
+	munlockall();     // Desbloqueia a memória
+}
+\end{lstlisting}
+
+Após a edição, usou-se \textit{ctrl + o} para salvar e \textit{ctrl + x} para sair.
+
+Uma vez editado o arquivo, basta usar o comando a seguir para compilar o teste:
+
+\lstset{language=Bash}
+\begin{lstlisting}
+gcc clock.c -o c-clock
+\end{lstlisting}
+
+O teste de Clock escrito em Bash-Script foi feito da seguinte maneira:
+
+\begin{lstlisting}
+nano bash-clock
+\end{lstlisting}
+
+Dentro do editor foi escrito o seguinte:
+
+\begin{lstlisting}
+echo 73 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio73/direction
+while true
+do echo 1 >/sys/class/gpio/gpio73/value
+echo 0 >/sys/class/gpio/gpio73/value 
+done
+\end{lstlisting}
+
+Após a edição, usou-se \textit{ctrl + o} para salvar e \textit{ctrl + x} para sair.
+
+Para conferir permissão de execução para o \textit{script} foi feito o seguinte:
+
+\begin{lstlisting}
+chmod +x bash-clock
+\end{lstlisting}
+
+\chapter{Teste de GPIO}
+\label{ap:gpio} 
+
+Para gerar o \textit{clock} de entrada para o teste de GPIO foi usado o \textit{Bash-Script} do apêndice \ref{ap:clk} com tempos de espera entre as alterações de nível.
+
+O teste de GPIO foi escrito em C e compilado a partir do Kit, com conta de root. O código aqui usado foi encontrado em [\cite{sam4}] e contou com algumas modificações.
+
+Para obter o teste, bastou-se realizar os seguintes comandos:
+
+\begin{lstlisting}
+# Abrindo aquivo para edição,
+ nano "gpio-test.c"
+ \end{lstlisting}
+
+Dentro do editor foi escrito o seguinte:
+\lstset{language=C}
+\begin{lstlisting}
+/* Small program to test gpio Linux
+ *
+ * Copyright (c) 2011, Free Electrons
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 as published by
+ * the Free Software Foundation.
+ * 
+ */
+
+#include <stdint.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <poll.h>
+
+//Pinos Usados
+static const char *gpio_in = "/sys/class/gpio/gpio75/value";
+static const char *gpio_out = "/sys/class/gpio/gpio73/value";
+#define MAX_BUF 64
+
+//Função de retorno de erro.
+static void pabort(const char *s)
+{
+	perror(s);
+	abort();
+}
+
+#define POLL_TIMEOUT -1 /* No timeout */
+
+int main (void)
+{
+  //Comandos para preparar o sistema para o teste.
+  system("echo 73 > /sys/class/gpio/export");
+  system("echo out > /sys/class/gipo/gpio73/direction"); 
+  system("echo 75 > /sys/class/gpio/export");
+  system("echo in > /sys/class/gipo/gpio74/direction");
+  system("echo both > /sys/class/gipo/gpio74/edge");
+
+	int ret = 0;
+	int fd, fd_output;
+	struct pollfd fdset;
+	char *buf[MAX_BUF];
+	long count = 0;
+
+  //Bloqueando memória
+	mlockall(MCL_CURRENT | MCL_FUTURE); 
+
+  //Abrindo File-descriptors
+	fd = open(gpio_in,  O_RDONLY | O_NONBLOCK );
+	if (fd < 0)
+		pabort("can't open gpio_in");
+
+	fd_output = open(gpio_out,  O_RDWR);
+
+	if (fd_output < 0)
+		pabort("can't open gpio_out");
+
+	fflush(stdout);
+	while (1)
+	{
+		fdset.fd = fd;
+		fdset.events = POLLPRI;
+		fdset.revents = 0;
+		ret = poll(&fdset, 1, POLL_TIMEOUT);      
+
+		if (ret < 0) {
+			printf("\npoll() failed!\n");
+			return -1;
+		}
+    
+		if (ret == 0) {
+			/* Must not appear*/
+			printf("Timeout .");
+		}
+    
+    //Gerando o pulso
+		if (fdset.revents & POLLPRI) {
+			/* Write "1"*/
+			write(fd_output,"1",2);
+			/* Write "0"*/
+			write(fd_output,"0",2);
+			read(fd, buf, MAX_BUF);
+			count++;
+		}
+
+		fflush(stdout);
+	}
+}
+ \end{lstlisting}
+Após a edição, usou-se \textit{ctrl + o} para salvar e \textit{ctrl + x} para sair.	
+	
+Para compilar o código editado	
+\lstset{language=Bash}
+\begin{lstlisting}
+gcc "gpio-test.c" -o "gpio-test"
+ \end{lstlisting}
+			
+	
+	
+	
+\chapter{Aquisição e Compilação do CyclicTest}
+\label{ap:cycl} 	
+
+Dentro da placa, foram realizados os seguintes comandos para aquisição e compilação do CyclicTest:
+
+\begin{lstlisting}
+# Adquirindo o Software GIT
+  apt-get install git
+# Adquirindo o código fonte do CyclicTest pelo repositório Git
+  git clone git://git.kernel.org/pub/scm/linux/kernel/git/clrkwllms/rt-tests.git 
+# Entrando na pasta e compilando o código
+  cd rt-tests
+  make all
+# Copiando o executável para um caminho padrão, a partir de onde ele pode ser executado de qualquer lugar.
+  cp ./cyclictest /usr/bin/
+# Para obter ajuda sobre os parâmetros:
+  cyclictest --help
+ \end{lstlisting}
+
+Cabe lembrar que o código é Software Livre e está disponível nos servidores do \textit{Kernel.org}.
+	
+\chapter{Algoritmo de Geração de Carga do Sistema}
+\label{ap:load}
+
+O \textit{script} de geração de carga foi adaptado de um encontrado em [\cite{sam4}].
+Inicialmente é necessário gerar um arquivo grande o suficiente para provocar carga na leitura. Isso pode ser feito encontrando um arquivo de \textit{changelog} já presente no sistema.
+
+\begin{lstlisting}
+zcat /usr/share/doc/gcc-4.6-base/changelog.Debian.gz > changelog.Debian
+ \end{lstlisting}
+			
+Após isso, o arquivo doload.sh foi editado como segue:
+
+\begin{lstlisting}
+nano doload.sh
+ \end{lstlisting}
+
+Dentro do arquivo foi escrito:
+
+\begin{lstlisting}
+#!/bin/sh
+#Geração de output (stdout) e uso de socket server.
+(while true; do cat changelog.Debian; sleep 7; done | netcat -vv -l -p 5566 ) & 
+a=$!
+#Gera tráfego de leitura e escrita.
+dd if=/dev/zero of=/dev/null &
+b=$!
+#Executa e mata um teste de performance 
+while true; do killall hackbench  > /dev/null 2>&1; sleep 5; done &
+d=$!
+while true; do /bin/hackbench 1 > /dev/null 2>&1; done &
+e=$!
+#Trafego gerado por leitura do sistema de arquivos.
+while true; do ls -lR / > /dev/null 2>&1; done &
+f=$!
+sleep $1
+#Mata os processos anteiores
+kill $a $b $c $d $e $f
+ \end{lstlisting}
+Após a edição, usou-se \textit{ctrl + o} para salvar e \textit{ctrl + x} para sair.	
+
+Para conferir permissão de execução para o script foi feito o seguinte:
+\begin{lstlisting}
+chmod +x doload.sh
+\end{lstlisting}
+	
